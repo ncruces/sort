@@ -1,108 +1,196 @@
 package quick
 
 import (
+	"cmp"
 	"math/rand"
+	"slices"
 	"testing"
 )
 
 func TestSort(t *testing.T) {
-	list := []int{
-		15, 3, 2, 31, 19, 21, 6, 7,
-		16, 4, 17, 30, 10, 11, 5, 18,
-		25, 12, 8, 28, 14, 29, 22, 0,
-		24, 13, 1, 20, 26, 27, 23, 9,
+	tests := []struct {
+		name string
+		list []int
+	}{
+		{"zeros", zeros(1_000_000)},
+		{"bits", bits(1_000_000)},
+		{"sorted", sorted(1_000_000)},
+		{"reversed", reversed(1_000_000)},
+		{"pipeorgan", pipeorgan(1_000_000)},
+		{"permutation", permutation(100)},
 	}
-	Sort(list)
-	for i, v := range list {
-		if i != v {
-			t.Error(i, v)
-		}
-	}
-}
-
-func TestInsertion(t *testing.T) {
-	list := []int{
-		15, 3, 2, 31, 19, 21, 6, 7,
-		16, 4, 17, 30, 10, 11, 5, 18,
-		25, 12, 8, 28, 14, 29, 22, 0,
-		24, 13, 1, 20, 26, 27, 23, 9,
-	}
-	insertion(list)
-	for i, v := range list {
-		if i != v {
-			t.Error(i, v)
-		}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			Sort(tt.list)
+			if !slices.IsSorted(tt.list) {
+				t.FailNow()
+			}
+		})
 	}
 }
 
 func TestSortFirst(t *testing.T) {
-	list := []int{
-		15, 3, 2, 31, 19, 21, 6, 7,
-		16, 4, 17, 30, 10, 11, 5, 18,
-		25, 12, 8, 28, 14, 29, 22, 0,
-		24, 13, 1, 20, 26, 27, 23, 9,
+	tests := []struct {
+		name string
+		list []int
+	}{
+		{"zeros", zeros(1_000_000)},
+		{"bits", bits(1_000_000)},
+		{"sorted", sorted(1_000_000)},
+		{"reversed", reversed(1_000_000)},
+		{"pipeorgan", pipeorgan(1_000_000)},
+		{"permutation", permutation(100)},
 	}
-	SortFirst(list, 11)
-	for i, v := range list[:11] {
-		if i != v {
-			t.Error(i, v)
-		}
-	}
-}
-
-func TestSelection(t *testing.T) {
-	list := []int{
-		15, 3, 2, 31, 19, 21, 6, 7,
-		16, 4, 17, 30, 10, 11, 5, 18,
-		25, 12, 8, 28, 14, 29, 22, 0,
-		24, 13, 1, 20, 26, 27, 23, 9,
-	}
-	selection(list, 11)
-	for i, v := range list[:11] {
-		if i != v {
-			t.Error(i, v)
-		}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			SortFirst(tt.list, 11)
+			if !slices.IsSorted(tt.list[:11]) {
+				t.FailNow()
+			}
+		})
 	}
 }
 
 func TestSelect(t *testing.T) {
-	list := []int{
-		15, 3, 2, 31, 19, 21, 6, 7,
-		16, 4, 17, 30, 10, 11, 5, 18,
-		25, 12, 8, 28, 14, 29, 22, 0,
-		24, 13, 1, 20, 26, 27, 23, 9,
+	tests := []struct {
+		name string
+		list []int
+	}{
+		{"zeros", zeros(1_000_000)},
+		{"bits", bits(1_000_000)},
+		{"sorted", sorted(1_000_000)},
+		{"reversed", reversed(1_000_000)},
+		{"pipeorgan", pipeorgan(1_000_000)},
+		{"permutation", permutation(100)},
 	}
-	if k := Select(list, 3); k != 3 {
-		t.Error(k)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			sel := Select(tt.list, 11)
+			slices.Sort(tt.list)
+			if sel != tt.list[11] {
+				t.FailNow()
+			}
+		})
 	}
+}
+
+func TestInsertion(t *testing.T) {
+	tests := []struct {
+		name string
+		list []int
+	}{
+		{"zeros", zeros(100)},
+		{"bits", bits(100)},
+		{"sorted", sorted(100)},
+		{"reversed", reversed(100)},
+		{"pipeorgan", pipeorgan(100)},
+		{"permutation", permutation(100)},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			insertion(tt.list)
+			if !slices.IsSorted(tt.list) {
+				t.FailNow()
+			}
+		})
+	}
+}
+
+func TestSelection(t *testing.T) {
+	tests := []struct {
+		name string
+		list []int
+	}{
+		{"zeros", zeros(100)},
+		{"bits", bits(100)},
+		{"sorted", sorted(100)},
+		{"reversed", reversed(100)},
+		{"pipeorgan", pipeorgan(100)},
+		{"permutation", permutation(100)},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			selection(tt.list, 11)
+			if !slices.IsSorted(tt.list[:11]) {
+				t.FailNow()
+			}
+		})
+	}
+}
+
+func FuzzPartition(f *testing.F) {
+	f.Fuzz(func(t *testing.T, s []byte) {
+		if len(s) < 2 {
+			t.SkipNow()
+		}
+
+		i := partition(s)
+
+		if len(s[:i]) == 0 || len(s[i:]) == 0 {
+			t.FailNow()
+		}
+		if cmp.Less(slices.Min(s[i:]), slices.Max(s[:i])) {
+			t.FailNow()
+		}
+	})
 }
 
 func BenchmarkSort(b *testing.B) {
-	s := make([]float64, 10_000_000)
-	for i := range s {
-		s[i] = rand.Float64()
-	}
-
+	list := floats(10_000_000)
 	b.ResetTimer()
-	Sort(s)
+	Sort(list)
 }
 
 func BenchmarkSortK(b *testing.B) {
-	s := make([]float64, 10_000_000)
-	for i := range s {
-		s[i] = rand.Float64()
-	}
-
+	list := floats(10_000_000)
 	b.ResetTimer()
-	SortFirst(s, 1_000)
+	SortFirst(list, 1_000)
 }
 
 func BenchmarkSelect(b *testing.B) {
-	s := make([]float64, 10_000_000)
+	list := floats(10_000_000)
+	b.ResetTimer()
+	Select(list, 1_000_000)
+}
+
+func zeros(n int) []int {
+	return make([]int, n)
+}
+
+func sorted(n int) []int {
+	s := make([]int, n)
+	for i := range s {
+		s[i] = i
+	}
+	return s
+}
+
+func reversed(n int) []int {
+	s := sorted(n)
+	slices.Reverse(s)
+	return s
+}
+
+func permutation(n int) []int {
+	return rand.Perm(n)
+}
+
+func bits(n int) []int {
+	s := rand.Perm(n)
+	for i := range s {
+		s[i] &= 1
+	}
+	return s
+}
+
+func floats(n int) []float64 {
+	s := make([]float64, n)
 	for i := range s {
 		s[i] = rand.Float64()
 	}
+	return s
+}
 
-	b.ResetTimer()
-	Select(s, 1_000_000)
+func pipeorgan(n int) []int {
+	return append(sorted(n/2), reversed(n/2)...)
 }

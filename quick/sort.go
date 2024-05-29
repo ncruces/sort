@@ -1,10 +1,10 @@
+// Package quick implements Tony Hoare's Quicksort and Quickselect.
 package quick
 
 import "cmp"
 
 // Sort uses the Quicksort algorithm to sort a slice.
-// On average the algorithm requres O(n·log(n)) space and time,
-// but the worse case is O(n²).
+// It uses O(n·log(n)) time and O(log(n)) space.
 func Sort[T cmp.Ordered](s []T) {
 	// We could check for len(s) > 1, and use Quicksort all the way down.
 	// In practise, Insertion sort performs better at small sizes.
@@ -17,8 +17,7 @@ func Sort[T cmp.Ordered](s []T) {
 }
 
 // SortFirst uses the Quickselect and Quicksort algorithms to sort the first k elements of a slice.
-// On average the algorithm requres O(n + k·log(k)) space and time,
-// but the worse case is O(n²).
+// It uses O(n + k·log(k)) time and O(log(n)) space.
 func SortFirst[T cmp.Ordered](s []T, k int) {
 	// This does a bounds check before making any changes to the slice.
 	_ = s[:k]
@@ -38,10 +37,9 @@ func SortFirst[T cmp.Ordered](s []T, k int) {
 	selection(s, k)
 }
 
-// Select uses the Quickselect algorithm to find element k of the slice, if sorted.
-// It partially sorts the slice around, and returns, s[k].
-// On average the algorithm requres O(n) space and time,
-// but the worse case is O(n²).
+// Select uses the Quickselect algorithm to find element k of the slice,
+// partially sorting the slice around, and returning, s[k].
+// It uses O(n) time and O(log(n)) space.
 func Select[T cmp.Ordered](s []T, k int) T {
 	// This does a bounds check before making any changes to the slice.
 	_ = s[k]
@@ -61,35 +59,35 @@ func Select[T cmp.Ordered](s []T, k int) T {
 	return s[k]
 }
 
-// Partition is the core of any Quicksort algorithm.
-// This version uses the middle element as a pivot.
-// It avoids the pitfalls of an already sorted,
-// reverse sorted, or all equal elements slice
-// being the worse cases for partition.
-// With this algorithm, those rather common cases
-// produce perfectly balanced partions instead.
-// In practise, this means that repeatedly using
-// Select and SortFirst on the same slice
-// does not exhibit worse case performance.
+// Partition is the core of the Quicksort algorithm.
+// This version uses the middle element as a pivot,
+// producing an optimal partition in many common cases.
+// If this turns out to be a terrible choice,
+// Median-of-medians is used to select a good pivot.
 func partition[T cmp.Ordered](s []T) int {
 	r := len(s) - 1
 	p := s[r/2]
+retry:
 	i := 0
 	j := r
-	for i <= j {
+	for {
 		for i < r && cmp.Less(s[i], p) {
 			i++
 		}
 		for j > 0 && cmp.Less(p, s[j]) {
 			j--
 		}
-		if i <= j {
-			s[i], s[j] = s[j], s[i]
-			i++
-			j--
+		if i > j {
+			if badPartition(i, r) {
+				p = medianOfMedians(s)
+				goto retry
+			}
+			return i
 		}
+		s[i], s[j] = s[j], s[i]
+		i++
+		j--
 	}
-	return i
 }
 
 // Insertion sort is used as the base case for Quicksort.
@@ -115,4 +113,21 @@ func selection[T cmp.Ordered](s []T, k int) {
 		}
 		s[i], s[m] = s[m], s[i]
 	}
+}
+
+// BadPartition identifies terrible partitions.
+func badPartition(i, r int) bool {
+	b := r / 16
+	return b > 4 && !(b < i && i < r-b)
+}
+
+// MedianOfMedians selects a good pivot for partition.
+func medianOfMedians[T cmp.Ordered](s []T) T {
+	m := 0
+	for i := 0; i+5 < len(s); i += 5 {
+		insertion(s[i : i+5])
+		s[m], s[i+2] = s[i+2], s[m]
+		m++
+	}
+	return Select(s[:m], m/2)
 }
