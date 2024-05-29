@@ -118,6 +118,21 @@ func TestSelection(t *testing.T) {
 	}
 }
 
+func TestBounds(t *testing.T) {
+	Sort[int](nil)
+	Sort([]int{0})
+
+	SortFirst[int](nil, 0)
+	SortFirst([]int{0}, 1)
+
+	Select([]int{0}, 0)
+
+	partition([]int{0})
+	insertion[int](nil)
+	selection[int](nil, 0)
+	medianOfMedians([]int{0})
+}
+
 func FuzzPartition(f *testing.F) {
 	f.Fuzz(func(t *testing.T, s []byte) {
 		if len(s) < 2 {
