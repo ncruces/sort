@@ -9,8 +9,9 @@ import "cmp"
 const (
 	minLen    = 32 // at least 1
 	minK      = 4  // at least 1
+	minMed3   = 32 // at least 1
 	minRatio  = 16 // at least 4
-	minMedian = 20 // at least 20
+	minMedMed = 20 // at least 20
 )
 
 // Sort uses the Quicksort algorithm to sort a slice.
@@ -83,6 +84,19 @@ func Select[T cmp.Ordered](s []T, k int) T {
 // It uses O(n) time and O(log(n)) space.
 func partition[T cmp.Ordered](s []T) int {
 	r := len(s) - 1
+	// For large r, sort 3 elements,
+	// and use their median as a pivot.
+	if r >= minMed3 {
+		if cmp.Less(s[r], s[0]) {
+			s[0], s[r] = s[r], s[0]
+		}
+		if cmp.Less(s[r/2], s[0]) {
+			s[0], s[r/2] = s[r/2], s[0]
+		}
+		if cmp.Less(s[r], s[r/2]) {
+			s[r], s[r/2] = s[r/2], s[r]
+		}
+	}
 	p := s[r/2]
 retry:
 	i := 0
@@ -95,6 +109,10 @@ retry:
 			j -= 1
 		}
 		if i > j {
+			// If p produces a bad partition use Median-of-medians
+			// to select a better pivot.
+			// Median-of-medians produces a good enough pivot that
+			// this happens only once.
 			if badPartition(i, r) {
 				p = medianOfMedians(s)
 				goto retry
@@ -134,20 +152,14 @@ func selection[T cmp.Ordered](s []T, k int) {
 	}
 }
 
-// BadPartition identifies terrible partitions.
-// To ensure termination, a bad pivot must lie
-// outside the middle 50% of the slice.
-func badPartition(i, r int) bool {
-	b := r / minRatio
-	return b > minMedian && !(b < i && i < r-b)
-}
-
 // MedianOfMedians selects a good pivot for partition.
 // A good pivot lies in the middle 40% of the slice.
 // It uses O(n) time and O(log(n)) space.
 func medianOfMedians[T cmp.Ordered](s []T) T {
 	m := 0
 	for i := 0; i+5 < len(s); i += 5 {
+		// Sort groups of 5 elements and move their medians
+		// to the start of the list.
 		insertion(s[i : i+5])
 		s[m], s[i+2] = s[i+2], s[m]
 		m += 1
@@ -155,5 +167,14 @@ func medianOfMedians[T cmp.Ordered](s []T) T {
 	if m < 2 {
 		return s[0]
 	}
+	// Use Quickselect to find the median-of-medians.
 	return Select(s[:m], m/2)
+}
+
+// BadPartition identifies terrible partitions.
+// To ensure termination, a bad pivot must lie
+// outside the middle 50% of the slice.
+func badPartition(i, r int) bool {
+	b := r / minRatio
+	return b > minMedMed && !(b < i && i < r-b)
 }
