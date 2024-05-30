@@ -20,8 +20,14 @@ func Sort[T cmp.Ordered](s []T) {
 	// In practise, Insertion sort performs better at small sizes.
 	for len(s) > minLen {
 		p := partition(s)
-		Sort(s[:p])
-		s = s[p:]
+		// Recursing into the smaller side conserves stack space.
+		if p > len(s)/2 {
+			Sort(s[p:])
+			s = s[:p]
+		} else {
+			Sort(s[:p])
+			s = s[p:]
+		}
 	}
 	insertion(s)
 }
