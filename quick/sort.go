@@ -83,10 +83,10 @@ retry:
 	j := r
 	for {
 		for i < r && cmp.Less(s[i], p) {
-			i++
+			i += 1
 		}
 		for j > 0 && cmp.Less(p, s[j]) {
-			j--
+			j -= 1
 		}
 		if i > j {
 			if badPartition(i, r) {
@@ -96,8 +96,8 @@ retry:
 			return i
 		}
 		s[i], s[j] = s[j], s[i]
-		i++
-		j--
+		i += 1
+		j -= 1
 	}
 }
 
@@ -107,7 +107,7 @@ func insertion[T cmp.Ordered](s []T) {
 	for i, p := range s {
 		for i > 0 && cmp.Less(p, s[i-1]) {
 			s[i] = s[i-1]
-			i--
+			i -= 1
 		}
 		s[i] = p
 	}
@@ -117,14 +117,14 @@ func insertion[T cmp.Ordered](s []T) {
 // It uses O(n·k) time and O(1) space (used for small k).
 func selection[T cmp.Ordered](s []T, k int) {
 	for i, p := range s[:k] {
-		m := i
+		m := 0
 		for j, q := range s[i:] {
 			if cmp.Less(q, p) {
-				m = i + j
+				m = j
 				p = q
 			}
 		}
-		s[i], s[m] = s[m], s[i]
+		s[i], s[m+i] = s[m+i], s[i]
 	}
 }
 
@@ -144,7 +144,7 @@ func medianOfMedians[T cmp.Ordered](s []T) T {
 	for i := 0; i+5 < len(s); i += 5 {
 		insertion(s[i : i+5])
 		s[m], s[i+2] = s[i+2], s[m]
-		m++
+		m += 1
 	}
 	if m < 2 {
 		return s[0]
