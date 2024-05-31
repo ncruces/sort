@@ -11,7 +11,7 @@ const (
 	minK      = 4  // at least 1
 	minMed3   = 32 // at least 1
 	minRatio  = 16 // at least 4
-	minMedMed = 20 // at least 20
+	minMedMed = 128
 )
 
 // Sort uses the Quicksort algorithm to sort a slice.
@@ -77,13 +77,16 @@ func Select[T cmp.Ordered](s []T, k int) T {
 }
 
 // Partition is the core of the Quicksort and Quickselect algorithms.
-// This version uses the middle element as a pivot,
-// producing an optimal partition in many common cases.
-// If this turns out to be a terrible choice,
-// Median-of-medians is used to select a good pivot.
+// This bit only does pivot selection:
+// the middle element for small slices,
+// the median of 3 for bigger slices.
+// This produces an optimal partition in many common cases.
+// If it turns out to be a terrible choice,
+// use Median-of-medians to select a good pivot.
 // It uses O(n) time and O(log(n)) space.
 func partition[T cmp.Ordered](s []T) int {
 	r := len(s) - 1
+
 	// For large r, sort 3 elements,
 	// and use their median as a pivot.
 	if r >= minMed3 {
@@ -97,8 +100,27 @@ func partition[T cmp.Ordered](s []T) int {
 			s[r], s[r/2] = s[r/2], s[r]
 		}
 	}
+
 	p := s[r/2]
-retry:
+	i := hoarePartition(s, p)
+
+	// For really large r, check if the pivot was bad,
+	// and use Median-of-medians to pick a good pivot.
+	if r >= minMedMed {
+		b := r / minRatio
+		if !(b < i && i < r-b) {
+			p = medianOfMedians(s)
+			i = hoarePartition(s, p)
+		}
+	}
+	return i
+}
+
+// Partition is the core of the Quicksort and Quickselect algorithms.
+// This bit implents the Hoare's partition scheme (not Lomuto).
+// Hoare's partition handles repeated elements nicely.
+func hoarePartition[T cmp.Ordered](s []T, p T) int {
+	r := len(s) - 1
 	i := 0
 	j := r
 	for {
@@ -109,14 +131,6 @@ retry:
 			j -= 1
 		}
 		if i > j {
-			// If p produces a bad partition use Median-of-medians
-			// to select a better pivot.
-			// Median-of-medians produces a good enough pivot that
-			// this happens only once.
-			if badPartition(i, r) {
-				p = medianOfMedians(s)
-				goto retry
-			}
 			return i
 		}
 		s[i], s[j] = s[j], s[i]
@@ -159,7 +173,7 @@ func medianOfMedians[T cmp.Ordered](s []T) T {
 	m := 0
 	for i := 0; i+5 < len(s); i += 5 {
 		// Sort groups of 5 elements and move their medians
-		// to the start of the list.
+		// to the start of the slice.
 		insertion(s[i : i+5])
 		s[m], s[i+2] = s[i+2], s[m]
 		m += 1
@@ -167,14 +181,6 @@ func medianOfMedians[T cmp.Ordered](s []T) T {
 	if m < 2 {
 		return s[0]
 	}
-	// Use Quickselect to find the median-of-medians.
+	// Use Quickselect to find the Median-of-medians.
 	return Select(s[:m], m/2)
-}
-
-// BadPartition identifies terrible partitions.
-// To ensure termination, a bad pivot must lie
-// outside the middle 50% of the slice.
-func badPartition(i, r int) bool {
-	b := r / minRatio
-	return b > minMedMed && !(b < i && i < r-b)
 }
