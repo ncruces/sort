@@ -17,7 +17,8 @@ func TestSort(t *testing.T) {
 		{"sorted", sorted(1_000_000)},
 		{"reversed", reversed(1_000_000)},
 		{"pipeorgan", pipeorgan(1_000_000)},
-		{"permutation", permutation(100)},
+		{"permutation", permutation(1_000_000)},
+		{"killer", killer(1024*1024 - 1)},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -39,12 +40,12 @@ func TestSortFirst(t *testing.T) {
 		{"sorted", sorted(1_000_000)},
 		{"reversed", reversed(1_000_000)},
 		{"pipeorgan", pipeorgan(1_000_000)},
-		{"permutation", permutation(100)},
+		{"permutation", permutation(1_000_000)},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			SortFirst(tt.list, 11)
-			if !slices.IsSorted(tt.list[:11]) {
+			SortFirst(tt.list, 1111)
+			if !slices.IsSorted(tt.list[:1111]) {
 				t.FailNow()
 			}
 		})
@@ -61,13 +62,13 @@ func TestSelect(t *testing.T) {
 		{"sorted", sorted(1_000_000)},
 		{"reversed", reversed(1_000_000)},
 		{"pipeorgan", pipeorgan(1_000_000)},
-		{"permutation", permutation(100)},
+		{"permutation", permutation(1_000_000)},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			sel := Select(tt.list, 11)
+			sel := Select(tt.list, 1111)
 			slices.Sort(tt.list)
-			if sel != tt.list[11] {
+			if sel != tt.list[1111] {
 				t.FailNow()
 			}
 		})
@@ -208,4 +209,31 @@ func floats(n int) []float64 {
 
 func pipeorgan(n int) []int {
 	return append(sorted(n/2), reversed(n/2)...)
+}
+
+func killer(n int) []int {
+	// https://webpages.charlotte.edu/rbunescu/courses/ou/cs4040/introsort.pdf
+
+	s := make([]int, n)
+
+	if n%2 != 0 {
+		s[n-1] = n
+		n--
+	}
+
+	m := n / 2
+	for i := 0; i < m; i++ {
+		// first half of array
+		if i%2 == 0 {
+			// even indices
+			s[i] = i + 1
+		} else {
+			// odd indices
+			s[i] = i + m + (m & 1)
+		}
+		// second half of array
+		s[m+i] = (i + 1) * 2
+	}
+
+	return s
 }

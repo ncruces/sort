@@ -16,7 +16,7 @@ func TestSort(t *testing.T) {
 		{"sorted", sorted(1_000_000)},
 		{"reversed", reversed(1_000_000)},
 		{"pipeorgan", pipeorgan(1_000_000)},
-		{"permutation", permutation(100)},
+		{"permutation", permutation(1_000_000)},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
