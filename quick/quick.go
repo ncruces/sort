@@ -78,11 +78,11 @@ func Select[T cmp.Ordered](s []T, k int) T {
 
 // Partition is the core of the Quicksort and Quickselect algorithms.
 // This bit only does pivot selection:
-// the middle element for small slices,
-// the median of 3 for bigger slices.
-// This produces an optimal partition in many common cases.
-// If it turns out to be a terrible choice,
-// use Median-of-medians to select a good pivot.
+// - the middle element for small slices,
+// - the median of 3 for bigger slices.
+// This produces optimal partitions in many common cases.
+// If it turns out to be a really bad choice,
+// use Median-of-medians to select a better pivot.
 // It uses O(n) time and O(log(n)) space.
 func partition[T cmp.Ordered](s []T) int {
 	r := len(s) - 1
@@ -105,7 +105,7 @@ func partition[T cmp.Ordered](s []T) int {
 	i := hoarePartition(s, p)
 
 	// For really large r, check if the pivot was bad,
-	// and use Median-of-medians to pick a good pivot.
+	// and use Median-of-medians to pick a better one.
 	if r >= minMedMed {
 		b := r / minRatio
 		if !(b < i && i < r-b) {
@@ -116,9 +116,8 @@ func partition[T cmp.Ordered](s []T) int {
 	return i
 }
 
-// Partition is the core of the Quicksort and Quickselect algorithms.
-// This bit implents the Hoare's partition scheme (not Lomuto).
-// Hoare's partition handles repeated elements nicely.
+// HoarePartition implements Hoare's partition scheme (not Lomuto).
+// Hoare's partition handles repeated elements sensibly.
 func hoarePartition[T cmp.Ordered](s []T, p T) int {
 	r := len(s) - 1
 	i := 0
