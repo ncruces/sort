@@ -52,6 +52,29 @@ func TestSortFirst(t *testing.T) {
 	}
 }
 
+func TestSortLast(t *testing.T) {
+	tests := []struct {
+		name string
+		list []int
+	}{
+		{"zeros", zeros(1_000_000)},
+		{"bits", bits(1_000_000)},
+		{"sorted", sorted(1_000_000)},
+		{"reversed", reversed(1_000_000)},
+		{"pipeorgan", pipeorgan(1_000_000)},
+		{"permutation", permutation(1_000_000)},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			SortLast(tt.list, 1111)
+			n := len(tt.list) - 1111
+			if !slices.IsSorted(tt.list[n:]) {
+				t.FailNow()
+			}
+		})
+	}
+}
+
 func TestSelect(t *testing.T) {
 	tests := []struct {
 		name string
@@ -126,6 +149,9 @@ func TestBounds(t *testing.T) {
 	SortFirst[int](nil, 0)
 	SortFirst([]int{0}, 1)
 
+	SortLast[int](nil, 0)
+	SortLast([]int{0}, 1)
+
 	Select([]int{0}, 0)
 
 	partition([]int{0})
@@ -157,10 +183,16 @@ func BenchmarkSort(b *testing.B) {
 	Sort(list)
 }
 
-func BenchmarkSortK(b *testing.B) {
+func BenchmarkSortFirst(b *testing.B) {
 	list := floats(10_000_000)
 	b.ResetTimer()
-	SortFirst(list, 1_000)
+	SortFirst(list, 10_000)
+}
+
+func BenchmarkSortLast(b *testing.B) {
+	list := floats(10_000_000)
+	b.ResetTimer()
+	SortLast(list, 10_000)
 }
 
 func BenchmarkSelect(b *testing.B) {

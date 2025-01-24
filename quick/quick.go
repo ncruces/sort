@@ -54,6 +54,16 @@ func SortFirst[T cmp.Ordered](s []T, k int) {
 	selection(s, k)
 }
 
+// SortLast uses the Quickselect and Quicksort algorithms to sort the last k elements of a slice.
+// It uses O(n + k·log(k)) time and O(log(n)) space.
+func SortLast[T cmp.Ordered](s []T, k int) {
+	if k != 0 {
+		n := len(s) - k
+		Select(s, n)
+		Sort(s[n+1:])
+	}
+}
+
 // Select uses the Quickselect algorithm to find element k of the slice,
 // partially sorting the slice around, and returning, s[k].
 // It uses O(n) time and O(log(n)) space.
