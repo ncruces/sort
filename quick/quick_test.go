@@ -157,7 +157,7 @@ func TestBounds(t *testing.T) {
 	partition([]int{0})
 	insertion[int](nil)
 	selection[int](nil, 0)
-	medianOfMedians([]int{0})
+	medianOfNinthers([]int{0})
 }
 
 func FuzzPartition(f *testing.F) {

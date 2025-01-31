@@ -1,6 +1,6 @@
 // Package quick implements Tony Hoare's Quicksort and Quickselect.
 //
-// This package avoids quadratic behavior by using Median-of-medians
+// This package avoids quadratic behavior by using median-of-ninthers
 // when a bad pivot is detected.
 package quick
 
@@ -11,7 +11,7 @@ const (
 	minK      = 4  // at least 1
 	minMed3   = 32 // at least 1
 	minRatio  = 16 // at least 4
-	minMedMed = 128
+	minMedNin = 144
 )
 
 // Sort uses the Quicksort algorithm to sort a slice.
@@ -92,7 +92,7 @@ func Select[T cmp.Ordered](s []T, k int) T {
 // - the median of 3 for bigger slices.
 // This produces optimal partitions in many common cases.
 // If it turns out to be a really bad choice,
-// use Median-of-medians to select a better pivot.
+// use median-of-ninthers to select a better pivot.
 // It uses O(n) time and O(log(n)) space.
 func partition[T cmp.Ordered](s []T) int {
 	r := len(s) - 1
@@ -100,14 +100,14 @@ func partition[T cmp.Ordered](s []T) int {
 	// For large r, sort 3 elements,
 	// and use their median as a pivot.
 	if r >= minMed3 {
-		if cmp.Less(s[r], s[0]) {
-			s[0], s[r] = s[r], s[0]
-		}
 		if cmp.Less(s[r/2], s[0]) {
 			s[0], s[r/2] = s[r/2], s[0]
 		}
 		if cmp.Less(s[r], s[r/2]) {
 			s[r], s[r/2] = s[r/2], s[r]
+			if cmp.Less(s[r/2], s[0]) {
+				s[0], s[r/2] = s[r/2], s[0]
+			}
 		}
 	}
 
@@ -115,11 +115,11 @@ func partition[T cmp.Ordered](s []T) int {
 	i := hoarePartition(s, p)
 
 	// For really large r, check if the pivot was bad,
-	// and use Median-of-medians to pick a better one.
-	if r >= minMedMed {
+	// and use median-of-ninthers to pick a better one.
+	if r >= minMedNin {
 		b := r / minRatio
 		if !(b < i && i < r-b) {
-			p = medianOfMedians(s)
+			p = medianOfNinthers(s)
 			i = hoarePartition(s, p)
 		}
 	}
@@ -175,21 +175,36 @@ func selection[T cmp.Ordered](s []T, k int) {
 	}
 }
 
-// MedianOfMedians selects a good pivot for partition.
-// A good pivot lies in the middle 40% of the slice.
+// MedianOfNinthers fills the first ninth of the slice
+// with the ninthers of all 9-tuples of the slice,
+// then uses Quickselect to find their median.
 // It uses O(n) time and O(log(n)) space.
-func medianOfMedians[T cmp.Ordered](s []T) T {
-	m := 0
-	for i := 0; i+5 < len(s); i += 5 {
-		// Sort groups of 5 elements and move their medians
-		// to the start of the slice.
-		insertion(s[i : i+5])
-		s[m], s[i+2] = s[i+2], s[m]
-		m += 1
-	}
-	if m < 2 {
+func medianOfNinthers[T cmp.Ordered](s []T) T {
+	m := mediansOfTriples(s)
+	n := mediansOfTriples(s[:m])
+	if n < 2 {
 		return s[0]
 	}
-	// Use Quickselect to find the Median-of-medians.
-	return Select(s[:m], m/2)
+	return Select(s[:n], n/2)
+}
+
+// MediansOfTriples fills the first third of the slice
+// with the medians of all triples of the slice.
+func mediansOfTriples[T cmp.Ordered](s []T) (m int) {
+	for i := 0; i+3 <= len(s); i += 3 {
+		t := s[i : i+3]
+		// Sort 3 elements.
+		if cmp.Less(t[1], t[0]) {
+			t[0], t[1] = t[1], t[0]
+		}
+		if cmp.Less(t[2], t[1]) {
+			t[1], t[2] = t[2], t[1]
+			if cmp.Less(t[1], t[0]) {
+				t[0], t[1] = t[1], t[0]
+			}
+		}
+		s[m], t[1] = t[1], s[m]
+		m += 1
+	}
+	return m
 }
