@@ -28,14 +28,16 @@ func heapify[T cmp.Ordered](s []T) {
 // It constructs binary heaps out of smaller heaps.
 // It uses O(log(n)) time and O(1) space.
 func siftDown[T cmp.Ordered](s []T, i int) {
+	t := s[i]
 	j := minSearch(s, i)
-	for cmp.Less(s[j], s[i]) {
+	for cmp.Less(s[j], t) {
 		j = (j - 1) / 2
 	}
 	for j > i {
-		s[j], s[i] = s[i], s[j]
+		s[j], t = t, s[j]
 		j = (j - 1) / 2
 	}
+	s[i] = t
 }
 
 // MinSearch searches for the leaf where
