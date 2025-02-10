@@ -66,7 +66,7 @@ func SortLast[T cmp.Ordered](s []T, k int) {
 
 // Select uses the Quickselect algorithm to find element k of the slice,
 // partially sorting the slice around, and returning, s[k].
-// It uses O(n) time and O(log(n)) space.
+// It uses O(n) time and O(log₉(n)) space.
 func Select[T cmp.Ordered](s []T, k int) T {
 	// This does a bounds check before making any changes to the slice.
 	_ = s[k]
@@ -93,22 +93,14 @@ func Select[T cmp.Ordered](s []T, k int) T {
 // This produces optimal partitions in many common cases.
 // If it turns out to be a really bad choice,
 // use median-of-ninthers to select a better pivot.
-// It uses O(n) time and O(log(n)) space.
+// It uses O(n) time and O(log₉(n)) space.
 func partition[T cmp.Ordered](s []T) int {
 	r := len(s) - 1
 
 	// For large r, sort 3 elements,
 	// and use their median as a pivot.
 	if r >= minMed3 {
-		if cmp.Less(s[r/2], s[0]) {
-			s[0], s[r/2] = s[r/2], s[0]
-		}
-		if cmp.Less(s[r], s[r/2]) {
-			s[r], s[r/2] = s[r/2], s[r]
-			if cmp.Less(s[r/2], s[0]) {
-				s[0], s[r/2] = s[r/2], s[0]
-			}
-		}
+		sort3(s, 0, r/2, r)
 	}
 
 	p := s[r/2]
@@ -128,19 +120,19 @@ func partition[T cmp.Ordered](s []T) int {
 
 // HoarePartition implements Hoare's partition scheme (not Lomuto).
 // Hoare's partition handles repeated elements sensibly.
+// It uses O(n) time and O(1) space.
 func hoarePartition[T cmp.Ordered](s []T, p T) int {
-	r := len(s) - 1
 	i := 0
-	j := r
+	j := len(s) - 1
 	for {
-		for i < r && cmp.Less(s[i], p) {
+		for cmp.Less(s[i], p) {
 			i += 1
 		}
-		for j > 0 && cmp.Less(p, s[j]) {
+		for cmp.Less(p, s[j]) {
 			j -= 1
 		}
-		if i > j {
-			return i
+		if i >= j {
+			return j + 1
 		}
 		s[i], s[j] = s[j], s[i]
 		i += 1
@@ -175,36 +167,38 @@ func selection[T cmp.Ordered](s []T, k int) {
 	}
 }
 
-// MedianOfNinthers fills the first ninth of the slice
-// with the ninthers of all 9-tuples of the slice,
+// MedianOfNinthers fills the middle ninth of the slice
+// with the ninthers of 9-tuples taken from the slice,
 // then uses Quickselect to find their median.
-// It uses O(n) time and O(log(n)) space.
+// It uses O(n) time and O(log₉(n)) space.
 func medianOfNinthers[T cmp.Ordered](s []T) T {
-	m := mediansOfTriples(s)
-	n := mediansOfTriples(s[:m])
-	if n < 2 {
-		return s[0]
-	}
-	return Select(s[:n], n/2)
+	s = mediansOfTriples(s)
+	s = mediansOfTriples(s)
+	return Select(s, len(s)/2)
 }
 
-// MediansOfTriples fills the first third of the slice
-// with the medians of all triples of the slice.
-func mediansOfTriples[T cmp.Ordered](s []T) (m int) {
-	for i := 0; i+3 <= len(s); i += 3 {
-		t := s[i : i+3]
-		// Sort 3 elements.
-		if cmp.Less(t[1], t[0]) {
-			t[0], t[1] = t[1], t[0]
-		}
-		if cmp.Less(t[2], t[1]) {
-			t[1], t[2] = t[2], t[1]
-			if cmp.Less(t[1], t[0]) {
-				t[0], t[1] = t[1], t[0]
-			}
-		}
-		s[m], t[1] = t[1], s[m]
-		m += 1
+// MediansOfTriples fills the middle third of the slice
+// with the medians of triples taken from the slice.
+func mediansOfTriples[T cmp.Ordered](s []T) []T {
+	n := len(s) / 3
+	if n == 0 {
+		return s
 	}
-	return m
+	for i := range n {
+		sort3(s, i, i+n, i+n+n)
+	}
+	return s[n : n+n]
+}
+
+// Sort3 sorts three elements of the slice.
+func sort3[T cmp.Ordered](s []T, i, j, k int) {
+	if cmp.Less(s[j], s[i]) {
+		s[i], s[j] = s[j], s[i]
+	}
+	if cmp.Less(s[k], s[j]) {
+		s[j], s[k] = s[k], s[j]
+		if cmp.Less(s[j], s[i]) {
+			s[i], s[j] = s[j], s[i]
+		}
+	}
 }
