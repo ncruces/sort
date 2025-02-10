@@ -157,9 +157,9 @@ func insertion[T cmp.Ordered](s []T) {
 func selection[T cmp.Ordered](s []T, k int) {
 	for i, p := range s[:k] {
 		m := 0
-		for j, q := range s[i:] {
+		for j, q := range s[i+1:] {
 			if cmp.Less(q, p) {
-				m = j
+				m = j + 1
 				p = q
 			}
 		}
@@ -177,13 +177,11 @@ func medianOfNinthers[T cmp.Ordered](s []T) T {
 	return Select(s, len(s)/2)
 }
 
-// MediansOfTriples fills the middle third of the slice
-// with the medians of triples taken from the slice.
+// MediansOfTriples returns the middle third of the slice
+// filled with the medians of triples taken from the slice.
+// It uses O(n) time and O(1) space.
 func mediansOfTriples[T cmp.Ordered](s []T) []T {
 	n := len(s) / 3
-	if n == 0 {
-		return s
-	}
 	for i := range n {
 		sort3(s, i, i+n, i+n+n)
 	}
