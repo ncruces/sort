@@ -1,4 +1,4 @@
-// Package shell implements Shellsort.
+// Package shell implements Shellsort with Tokuda's sequence.
 package shell
 
 import "cmp"

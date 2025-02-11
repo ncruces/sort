@@ -14,6 +14,7 @@ func TestSort(t *testing.T) {
 		{"zeros", zeros(1_000_000)},
 		{"bits", bits(1_000_000)},
 		{"sorted", sorted(1_000_000)},
+		{"rotated", rotated(1_000_000)},
 		{"reversed", reversed(1_000_000)},
 		{"pipeorgan", pipeorgan(1_000_000)},
 		{"permutation", permutation(1_000_000)},
@@ -43,6 +44,15 @@ func sorted(n int) []int {
 	for i := range s {
 		s[i] = i
 	}
+	return s
+}
+
+func rotated(n int) []int {
+	s := make([]int, n)
+	for i := range s {
+		s[i] = i + 1
+	}
+	s[n-1] = 0
 	return s
 }
 
