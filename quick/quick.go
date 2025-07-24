@@ -9,9 +9,9 @@ import "cmp"
 const (
 	minLen    = 32 // at least 1
 	minK      = 4  // at least 1
-	minMed3   = 32 // at least 1
-	minRatio  = 16 // at least 4
-	minMedNin = 144
+	minMed3   = 32
+	minRatio  = 16 // at least 1
+	minMedNin = minRatio * 9
 )
 
 // Sort uses the Quicksort algorithm to sort a slice.
