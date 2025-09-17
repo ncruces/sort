@@ -32,7 +32,7 @@ An implementation of Floyd's bottom-up Heapsort.
 
 ## Shellsort
 
-An implementation of Shellsort with Tokuda's sequence.
+An implementation of Shellsort with the Gonnet & Baeza-Yates gap sequence.
 
 ![heapsort visualization](anims/shell.png)
 

@@ -106,8 +106,9 @@ func partition[T cmp.Ordered](s []T) int {
 	p := s[r/2]
 	i := hoarePartition(s, p)
 
-	// For really large r, check if the pivot was bad,
-	// and use median-of-ninthers to pick a better one.
+	// For really large r, check if the partition was bad,
+	// use median-of-ninthers to pick a better pivot,
+	// and try again.
 	if r >= minMedNin {
 		b := r / minRatio
 		if !(b < i && i < r-b) {

@@ -1,40 +1,13 @@
-// Package shell implements Shellsort with Tokuda's sequence.
+// Package shell implements Shellsort with the
+// Gonnet & Baeza-Yates gap sequence.
 package shell
 
 import "cmp"
 
 // Sort uses the Shellsort algorithm to sort a slice.
 func Sort[T cmp.Ordered](s []T) {
-	tokuda := [...]int{
-		1147718700,
-		510097200,
-		226709866,
-		100759940,
-		44782196,
-		19903198,
-		8845866,
-		3931496,
-		1747331,
-		776591,
-		345152,
-		153401,
-		68178,
-		30301,
-		13467,
-		5985,
-		2660,
-		1182,
-		525,
-		233,
-		103,
-		46,
-		20,
-		9,
-		4,
-		1,
-	}
-
-	for _, gap := range tokuda {
+	for gap := len(s); gap > 1; {
+		gap = int(max(1, (uint64(gap)*5-1)/11))
 		for i := gap; i < len(s); i += 1 {
 			j, p := i, s[i]
 			for j >= gap && cmp.Less(p, s[j-gap]) {
