@@ -29,6 +29,11 @@ func TestSort(t *testing.T) {
 	}
 }
 
+func TestBounds(t *testing.T) {
+	Sort[int](nil)
+	Sort([]int{0})
+}
+
 func BenchmarkSort(b *testing.B) {
 	list := floats(10_000_000)
 	b.ResetTimer()

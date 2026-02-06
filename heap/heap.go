@@ -9,8 +9,28 @@ func Sort[T cmp.Ordered](s []T) {
 	heapify(s)
 
 	m := len(s)
-	for m > 1 {
-		m -= 1
+	for {
+		if m--; m <= 0 {
+			break
+		}
+		s[0], s[m] = s[m], s[0]
+		siftDown(s[:m], 0)
+	}
+}
+
+// SortLast uses the Heapsort algorithm to sort the last k elements of a slice.
+// It uses O(n + k·log(n)) time and O(1) space.
+func SortLast[T cmp.Ordered](s []T, k int) {
+	// This does a bounds check before making any changes to the slice.
+	_ = s[len(s)-k:]
+
+	heapify(s)
+
+	m := len(s)
+	for range k {
+		if m--; m <= 0 {
+			break
+		}
 		s[0], s[m] = s[m], s[0]
 		siftDown(s[:m], 0)
 	}

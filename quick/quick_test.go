@@ -70,7 +70,7 @@ func TestSortLast(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			SortLast(tt.list, 1111)
-			n := len(tt.list) - 1111
+			n := len(tt.list) - 1111 - 1
 			if !slices.IsSorted(tt.list[n:]) {
 				t.FailNow()
 			}
