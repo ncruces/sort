@@ -4,13 +4,17 @@
 // when a bad pivot is detected.
 package quick
 
-import "cmp"
+import (
+	"cmp"
+	"slices"
+)
 
 const (
 	minLen    = 32 // at least 1
 	minK      = 4  // at least 1
 	minMed3   = 32
 	minRatio  = 16 // at least 1
+	minSorted = minLen * 4
 	minMedNin = minRatio * 9
 )
 
@@ -20,7 +24,10 @@ func Sort[T cmp.Ordered](s []T) {
 	// We could check for len(s) > 1, and use Quicksort all the way down.
 	// In practise, Insertion sort performs better at small sizes.
 	for len(s) > minLen {
-		p := partition(s)
+		p, ok := partition(s)
+		if ok {
+			return
+		}
 		// Recursing into the smaller side conserves stack space.
 		if p > len(s)/2 {
 			Sort(s[p:])
@@ -42,7 +49,10 @@ func SortFirst[T cmp.Ordered](s []T, k int) {
 	// We could check for len(s) > 1, and use Quickselect all the way down.
 	// In practise, Selection sort performs better for small k.
 	for k > minK {
-		p := partition(s)
+		p, ok := partition(s)
+		if ok {
+			return
+		}
 		if p > k {
 			s = s[:p]
 		} else {
@@ -74,7 +84,10 @@ func Select[T cmp.Ordered](s []T, k int) T {
 	// We could check for len(s) > 1, and use Quickselect all the way down.
 	// In practise, Selection sort performs better for small k.
 	for k >= minK {
-		p := partition(s)
+		p, ok := partition(s)
+		if ok {
+			return s[k]
+		}
 		if p > k {
 			s = s[:p]
 		} else {
@@ -94,7 +107,7 @@ func Select[T cmp.Ordered](s []T, k int) T {
 // If it turns out to be a really bad choice,
 // use median-of-ninthers to select a better pivot.
 // It uses O(n) time and O(log₉(n)) space.
-func partition[T cmp.Ordered](s []T) int {
+func partition[T cmp.Ordered](s []T) (int, bool) {
 	r := len(s) - 1
 
 	// For large r, sort 3 elements,
@@ -104,7 +117,7 @@ func partition[T cmp.Ordered](s []T) int {
 	}
 
 	p := s[r/2]
-	i := hoarePartition(s, p)
+	i, ok := hoarePartition(s, p)
 
 	// For really large r, check if the partition was bad,
 	// use median-of-ninthers to pick a better pivot,
@@ -113,16 +126,17 @@ func partition[T cmp.Ordered](s []T) int {
 		b := r / minRatio
 		if !(b < i && i < r-b) {
 			p = medianOfNinthers(s)
-			i = hoarePartition(s, p)
+			i, _ = hoarePartition(s, p)
 		}
 	}
-	return i
+	return i, ok && r >= minSorted && slices.IsSorted(s)
 }
 
 // HoarePartition implements Hoare's partition scheme (not Lomuto).
 // Hoare's partition handles repeated elements sensibly.
 // It uses O(n) time and O(1) space.
-func hoarePartition[T cmp.Ordered](s []T, p T) int {
+func hoarePartition[T cmp.Ordered](s []T, p T) (int, bool) {
+	n := 0
 	i := 0
 	j := len(s) - 1
 	for {
@@ -133,9 +147,10 @@ func hoarePartition[T cmp.Ordered](s []T, p T) int {
 			j -= 1
 		}
 		if i >= j {
-			return j + 1
+			return j + 1, n == 0 || n >= len(s)/2
 		}
 		s[i], s[j] = s[j], s[i]
+		n += 1
 		i += 1
 		j -= 1
 	}

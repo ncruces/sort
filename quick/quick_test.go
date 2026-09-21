@@ -171,7 +171,7 @@ func FuzzPartition(f *testing.F) {
 			t.SkipNow()
 		}
 
-		i := partition(s)
+		i, ok := partition(s)
 
 		if len(s[:i]) == 0 || len(s[i:]) == 0 {
 			t.FailNow()
@@ -179,11 +179,26 @@ func FuzzPartition(f *testing.F) {
 		if cmp.Less(slices.Min(s[i:]), slices.Max(s[:i])) {
 			t.FailNow()
 		}
+		if ok && !slices.IsSorted(s) {
+			t.FailNow()
+		}
 	})
 }
 
 func BenchmarkSort(b *testing.B) {
 	list := floats(10_000_000)
+	b.ResetTimer()
+	Sort(list)
+}
+
+func BenchmarkSorted(b *testing.B) {
+	list := sorted(10_000_000)
+	b.ResetTimer()
+	Sort(list)
+}
+
+func BenchmarkSortBits(b *testing.B) {
+	list := bits(10_000_000)
 	b.ResetTimer()
 	Sort(list)
 }

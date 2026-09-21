@@ -1,7 +1,6 @@
 # Sorting algorithms
 
 [![Go Reference](https://pkg.go.dev/badge/image)](https://pkg.go.dev/github.com/ncruces/sort)
-[![Go Report](https://goreportcard.com/badge/github.com/ncruces/sort)](https://goreportcard.com/report/github.com/ncruces/sort)
 [![Go Coverage](https://github.com/ncruces/sort/wiki/coverage.svg)](https://raw.githack.com/wiki/ncruces/sort/coverage.html)
 
 Sorting algorithms implemented in Go.\
@@ -20,6 +19,10 @@ It's flexible, and gives you asymptotically optimal algorithms for median findin
 This version avoids quadratic behavior by using median-of-ninthers when a bad pivot is detected:
 
 ![median-of-ninthers visualization](anims/ninthers.png)
+
+The algorithm adapts to mostly sorted, reversed and low cardinality inputs
+by tracking the number of swaps,
+and exiting early for already sorted sub-slices.
 
 The algorithm is fully deterministic,
 and every step contributes to partially sorting the array.
