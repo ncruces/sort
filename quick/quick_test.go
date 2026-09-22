@@ -78,6 +78,30 @@ func TestSortLast(t *testing.T) {
 	}
 }
 
+func TestParallel(t *testing.T) {
+	tests := []struct {
+		name string
+		list []int
+	}{
+		{"zeros", zeros(1_000_000)},
+		{"bits", bits(1_000_000)},
+		{"sorted", sorted(1_000_000)},
+		{"rotated", rotated(1_000_000)},
+		{"reversed", reversed(1_000_000)},
+		{"pipeorgan", pipeorgan(1_000_000)},
+		{"permutation", permutation(1_000_000)},
+		{"killer", killer(1024*1024 - 1)},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ParallelSort(tt.list)
+			if !slices.IsSorted(tt.list) {
+				t.FailNow()
+			}
+		})
+	}
+}
+
 func TestSelect(t *testing.T) {
 	tests := []struct {
 		name string
@@ -213,6 +237,12 @@ func BenchmarkSortLast(b *testing.B) {
 	list := floats(10_000_000)
 	b.ResetTimer()
 	SortLast(list, 10_000)
+}
+
+func BenchmarkParallel(b *testing.B) {
+	list := floats(10_000_000)
+	b.ResetTimer()
+	ParallelSort(list)
 }
 
 func BenchmarkSelect(b *testing.B) {

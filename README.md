@@ -16,7 +16,8 @@ It's flexible, and gives you asymptotically optimal algorithms for median findin
 
 ![quicksort visualization](anims/quick.png)
 
-This version avoids quadratic behavior by using median-of-ninthers when a bad pivot is detected:
+This version avoids quadratic behavior by using [median-of-ninthers](https://github.com/andralex/MedianOfNinthers)
+when a bad pivot is detected:
 
 ![median-of-ninthers visualization](anims/ninthers.png)
 
@@ -26,6 +27,8 @@ and exiting early for already sorted sub-slices.
 
 The algorithm is fully deterministic,
 and every step contributes to partially sorting the array.
+
+There's also a naïve parallel version.
 
 ## Heapsort
 

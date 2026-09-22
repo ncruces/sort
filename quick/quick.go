@@ -7,6 +7,7 @@ package quick
 import (
 	"cmp"
 	"slices"
+	"sync"
 )
 
 const (
@@ -16,6 +17,7 @@ const (
 	minRatio  = 16 // at least 1
 	minSorted = minLen * 4
 	minMedNin = minRatio * 9
+	minGo     = 10000
 )
 
 // Sort uses the Quicksort algorithm to sort a slice.
@@ -72,6 +74,33 @@ func SortLast[T cmp.Ordered](s []T, k int) {
 		Select(s, n)
 		Sort(s[n+1:])
 	}
+}
+
+// ParallelSort uses the Quicksort algorithm to sort a slice.
+// It uses O(n·log(n)) work, O(n) span, and O(log(n)) space.
+func ParallelSort[T cmp.Ordered](s []T) {
+	var wg sync.WaitGroup
+	defer wg.Wait()
+	for len(s) > minLen {
+		p, ok := partition(s)
+		if ok {
+			return
+		}
+		var x []T
+		if p > len(s)/2 {
+			x = s[p:]
+			s = s[:p]
+		} else {
+			x = s[:p]
+			s = s[p:]
+		}
+		if len(x) >= minGo {
+			wg.Go(func() { ParallelSort(x) })
+		} else {
+			Sort(x)
+		}
+	}
+	insertion(s)
 }
 
 // Select uses the Quickselect algorithm to find element k of the slice,
