@@ -20,7 +20,7 @@ This version avoids quadratic behavior by using median-of-ninthers when a bad pi
 
 ![median-of-ninthers visualization](anims/ninthers.png)
 
-The algorithm adapts to mostly sorted, reversed and low cardinality inputs
+It adapts to mostly sorted, reversed and low cardinality inputs
 by tracking the number of swaps,
 and exiting early for already sorted sub-slices.
 

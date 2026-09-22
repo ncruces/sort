@@ -22,7 +22,7 @@ const (
 // It uses O(n·log(n)) time and O(log(n)) space.
 func Sort[T cmp.Ordered](s []T) {
 	// We could check for len(s) > 1, and use Quicksort all the way down.
-	// In practise, Insertion sort performs better at small sizes.
+	// In practice, insertion sort performs better at small sizes.
 	for len(s) > minLen {
 		p, ok := partition(s)
 		if ok {
@@ -44,10 +44,10 @@ func Sort[T cmp.Ordered](s []T) {
 // It uses O(n + k·log(k)) time and O(log(n)) space.
 func SortFirst[T cmp.Ordered](s []T, k int) {
 	// This does a bounds check before making any changes to the slice.
-	_ = s[:k]
+	_ = s[:k:len(s)]
 
 	// We could check for len(s) > 1, and use Quickselect all the way down.
-	// In practise, Selection sort performs better for small k.
+	// In practice, selection sort performs better for small k.
 	for k > minK {
 		p, ok := partition(s)
 		if ok {
@@ -82,7 +82,7 @@ func Select[T cmp.Ordered](s []T, k int) T {
 	_ = s[k]
 
 	// We could check for len(s) > 1, and use Quickselect all the way down.
-	// In practise, Selection sort performs better for small k.
+	// In practice, selection sort performs better for small k.
 	for k >= minK {
 		p, ok := partition(s)
 		if ok {
@@ -100,6 +100,7 @@ func Select[T cmp.Ordered](s []T, k int) T {
 }
 
 // Partition is the core of the Quicksort and Quickselect algorithms.
+// Returns true if it is certain that the slice is sorted at this point.
 // This bit only does pivot selection:
 // - the middle element for small slices,
 // - the median of 3 for bigger slices.
@@ -127,12 +128,15 @@ func partition[T cmp.Ordered](s []T) (int, bool) {
 		if !(b < i && i < r-b) {
 			p = medianOfNinthers(s)
 			i, _ = hoarePartition(s, p)
+			// It's exceedingly unlikely s is sorted at this point.
+			return i, false
 		}
 	}
 	return i, ok && r >= minSorted && slices.IsSorted(s)
 }
 
 // HoarePartition implements Hoare's partition scheme (not Lomuto).
+// Returns true if it is likely that the slice is sorted at this point.
 // Hoare's partition handles repeated elements sensibly.
 // It uses O(n) time and O(1) space.
 func hoarePartition[T cmp.Ordered](s []T, p T) (int, bool) {
@@ -147,7 +151,10 @@ func hoarePartition[T cmp.Ordered](s []T, p T) (int, bool) {
 			j -= 1
 		}
 		if i >= j {
-			return j + 1, n == 0 || n >= len(s)/2
+			// If we swapped:
+			// - nothing, the slice was likely already sorted;
+			// - everything, the slice was likely either reversed or all equal.
+			return j + 1, n == 0 || n >= len(s)/2-1
 		}
 		s[i], s[j] = s[j], s[i]
 		n += 1
@@ -179,7 +186,8 @@ func selection[T cmp.Ordered](s []T, k int) {
 				p = q
 			}
 		}
-		s[i], s[m+i] = s[m+i], s[i]
+		s[i+m] = s[i]
+		s[i] = p
 	}
 }
 
