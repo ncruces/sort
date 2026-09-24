@@ -1,4 +1,4 @@
-package shell
+package sort
 
 import (
 	"flag"
@@ -15,29 +15,17 @@ func TestMain(m *testing.M) {
 }
 
 func TestSort(t *testing.T) {
-	for name, list := range Ints(1_000_000) {
-		t.Run(name, func(t *testing.T) {
-			Sort(list)
-			if !slices.IsSorted(list) {
-				t.FailNow()
-			}
-		})
-	}
+	slices.Sort(Floats(1_000_000))
 }
 
-func TestBounds(t *testing.T) {
-	Sort[int](nil)
-	Sort([]int{0})
-}
-
-func BenchmarkSort(b *testing.B) {
+func BenchmarkStandard(b *testing.B) {
 	list := Floats(10_000_000)
 	b.Run("floats", func(b *testing.B) {
-		Sort(slices.Clone(list))
+		slices.Sort(slices.Clone(list))
 	})
 	for name, list := range Ints(10_000_000) {
 		b.Run(name, func(b *testing.B) {
-			Sort(slices.Clone(list))
+			slices.Sort(slices.Clone(list))
 		})
 	}
 }

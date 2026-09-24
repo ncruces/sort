@@ -2,29 +2,24 @@ package quick
 
 import (
 	"cmp"
-	"math/rand"
+	"flag"
+	"os"
 	"slices"
 	"testing"
+
+	. "github.com/ncruces/sort/internal"
 )
 
+func TestMain(m *testing.M) {
+	_ = flag.Set("test.benchtime", "1x")
+	os.Exit(m.Run())
+}
+
 func TestSort(t *testing.T) {
-	tests := []struct {
-		name string
-		list []int
-	}{
-		{"zeros", zeros(1_000_000)},
-		{"bits", bits(1_000_000)},
-		{"sorted", sorted(1_000_000)},
-		{"rotated", rotated(1_000_000)},
-		{"reversed", reversed(1_000_000)},
-		{"pipeorgan", pipeorgan(1_000_000)},
-		{"permutation", permutation(1_000_000)},
-		{"killer", killer(1024*1024 - 1)},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			Sort(tt.list)
-			if !slices.IsSorted(tt.list) {
+	for name, list := range Ints(1_000_000) {
+		t.Run(name, func(t *testing.T) {
+			Sort(list)
+			if !slices.IsSorted(list) {
 				t.FailNow()
 			}
 		})
@@ -32,22 +27,10 @@ func TestSort(t *testing.T) {
 }
 
 func TestSortFirst(t *testing.T) {
-	tests := []struct {
-		name string
-		list []int
-	}{
-		{"zeros", zeros(1_000_000)},
-		{"bits", bits(1_000_000)},
-		{"sorted", sorted(1_000_000)},
-		{"rotated", rotated(1_000_000)},
-		{"reversed", reversed(1_000_000)},
-		{"pipeorgan", pipeorgan(1_000_000)},
-		{"permutation", permutation(1_000_000)},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			SortFirst(tt.list, 1111)
-			if !slices.IsSorted(tt.list[:1111]) {
+	for name, list := range Ints(1_000_000) {
+		t.Run(name, func(t *testing.T) {
+			SortFirst(list, 1111)
+			if !slices.IsSorted(list[:1111]) {
 				t.FailNow()
 			}
 		})
@@ -55,23 +38,11 @@ func TestSortFirst(t *testing.T) {
 }
 
 func TestSortLast(t *testing.T) {
-	tests := []struct {
-		name string
-		list []int
-	}{
-		{"zeros", zeros(1_000_000)},
-		{"bits", bits(1_000_000)},
-		{"sorted", sorted(1_000_000)},
-		{"rotated", rotated(1_000_000)},
-		{"reversed", reversed(1_000_000)},
-		{"pipeorgan", pipeorgan(1_000_000)},
-		{"permutation", permutation(1_000_000)},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			SortLast(tt.list, 1111)
-			n := len(tt.list) - 1111 - 1
-			if !slices.IsSorted(tt.list[n:]) {
+	for name, list := range Ints(1_000_000) {
+		t.Run(name, func(t *testing.T) {
+			SortLast(list, 1111)
+			n := len(list) - 1111 - 1
+			if !slices.IsSorted(list[n:]) {
 				t.FailNow()
 			}
 		})
@@ -79,23 +50,10 @@ func TestSortLast(t *testing.T) {
 }
 
 func TestParallel(t *testing.T) {
-	tests := []struct {
-		name string
-		list []int
-	}{
-		{"zeros", zeros(1_000_000)},
-		{"bits", bits(1_000_000)},
-		{"sorted", sorted(1_000_000)},
-		{"rotated", rotated(1_000_000)},
-		{"reversed", reversed(1_000_000)},
-		{"pipeorgan", pipeorgan(1_000_000)},
-		{"permutation", permutation(1_000_000)},
-		{"killer", killer(1024*1024 - 1)},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ParallelSort(tt.list)
-			if !slices.IsSorted(tt.list) {
+	for name, list := range Ints(1_000_000) {
+		t.Run(name, func(t *testing.T) {
+			ParallelSort(list)
+			if !slices.IsSorted(list) {
 				t.FailNow()
 			}
 		})
@@ -103,23 +61,11 @@ func TestParallel(t *testing.T) {
 }
 
 func TestSelect(t *testing.T) {
-	tests := []struct {
-		name string
-		list []int
-	}{
-		{"zeros", zeros(1_000_000)},
-		{"bits", bits(1_000_000)},
-		{"sorted", sorted(1_000_000)},
-		{"rotated", rotated(1_000_000)},
-		{"reversed", reversed(1_000_000)},
-		{"pipeorgan", pipeorgan(1_000_000)},
-		{"permutation", permutation(1_000_000)},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			sel := Select(tt.list, 1111)
-			slices.Sort(tt.list)
-			if sel != tt.list[1111] {
+	for name, list := range Ints(1_000_000) {
+		t.Run(name, func(t *testing.T) {
+			sel := Select(list, 1111)
+			slices.Sort(list)
+			if sel != list[1111] {
 				t.FailNow()
 			}
 		})
@@ -127,22 +73,10 @@ func TestSelect(t *testing.T) {
 }
 
 func TestInsertion(t *testing.T) {
-	tests := []struct {
-		name string
-		list []int
-	}{
-		{"zeros", zeros(100)},
-		{"bits", bits(100)},
-		{"sorted", sorted(100)},
-		{"rotated", rotated(100)},
-		{"reversed", reversed(100)},
-		{"pipeorgan", pipeorgan(100)},
-		{"permutation", permutation(100)},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			insertion(tt.list)
-			if !slices.IsSorted(tt.list) {
+	for name, list := range Ints(100) {
+		t.Run(name, func(t *testing.T) {
+			insertion(list)
+			if !slices.IsSorted(list) {
 				t.FailNow()
 			}
 		})
@@ -150,22 +84,10 @@ func TestInsertion(t *testing.T) {
 }
 
 func TestSelection(t *testing.T) {
-	tests := []struct {
-		name string
-		list []int
-	}{
-		{"zeros", zeros(100)},
-		{"bits", bits(100)},
-		{"sorted", sorted(100)},
-		{"rotated", rotated(100)},
-		{"reversed", reversed(100)},
-		{"pipeorgan", pipeorgan(100)},
-		{"permutation", permutation(100)},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			selection(tt.list, 11)
-			if !slices.IsSorted(tt.list[:11]) {
+	for name, list := range Ints(100) {
+		t.Run(name, func(t *testing.T) {
+			selection(list, 11)
+			if !slices.IsSorted(list[:11]) {
 				t.FailNow()
 			}
 		})
@@ -210,121 +132,43 @@ func FuzzPartition(f *testing.F) {
 }
 
 func BenchmarkSort(b *testing.B) {
-	list := floats(10_000_000)
-	b.ResetTimer()
-	Sort(list)
+	list := Floats(10_000_000)
+	b.Run("floats", func(b *testing.B) {
+		Sort(slices.Clone(list))
+	})
+	for name, list := range Ints(10_000_000) {
+		b.Run(name, func(b *testing.B) {
+			Sort(slices.Clone(list))
+		})
+	}
 }
 
-func BenchmarkSorted(b *testing.B) {
-	list := sorted(10_000_000)
-	b.ResetTimer()
-	Sort(list)
-}
-
-func BenchmarkSortBits(b *testing.B) {
-	list := bits(10_000_000)
-	b.ResetTimer()
-	Sort(list)
+func BenchmarkParallel(b *testing.B) {
+	list := Floats(10_000_000)
+	b.Run("floats", func(b *testing.B) {
+		ParallelSort(slices.Clone(list))
+	})
+	for name, list := range Ints(10_000_000) {
+		b.Run(name, func(b *testing.B) {
+			ParallelSort(slices.Clone(list))
+		})
+	}
 }
 
 func BenchmarkSortFirst(b *testing.B) {
-	list := floats(10_000_000)
+	list := Floats(10_000_000)
 	b.ResetTimer()
 	SortFirst(list, 10_000)
 }
 
 func BenchmarkSortLast(b *testing.B) {
-	list := floats(10_000_000)
+	list := Floats(10_000_000)
 	b.ResetTimer()
 	SortLast(list, 10_000)
 }
 
-func BenchmarkParallel(b *testing.B) {
-	list := floats(10_000_000)
-	b.ResetTimer()
-	ParallelSort(list)
-}
-
 func BenchmarkSelect(b *testing.B) {
-	list := floats(10_000_000)
+	list := Floats(10_000_000)
 	b.ResetTimer()
 	Select(list, 1_000_000)
-}
-
-func zeros(n int) []int {
-	return make([]int, n)
-}
-
-func sorted(n int) []int {
-	s := make([]int, n)
-	for i := range s {
-		s[i] = i
-	}
-	return s
-}
-
-func rotated(n int) []int {
-	s := make([]int, n)
-	for i := range s {
-		s[i] = i + 1
-	}
-	s[n-1] = 0
-	return s
-}
-
-func reversed(n int) []int {
-	s := sorted(n)
-	slices.Reverse(s)
-	return s
-}
-
-func permutation(n int) []int {
-	return rand.Perm(n)
-}
-
-func bits(n int) []int {
-	s := rand.Perm(n)
-	for i := range s {
-		s[i] &= 1
-	}
-	return s
-}
-
-func floats(n int) []float64 {
-	s := make([]float64, n)
-	for i := range s {
-		s[i] = rand.Float64()
-	}
-	return s
-}
-
-func pipeorgan(n int) []int {
-	return append(sorted(n/2), reversed(n/2)...)
-}
-
-func killer(n int) []int {
-	// https://webpages.charlotte.edu/rbunescu/courses/ou/cs4040/introsort.pdf
-
-	s := make([]int, n)
-
-	if n%2 != 0 {
-		s[n-1] = n
-		n--
-	}
-
-	m := n / 2
-	for i := 0; i < m; i++ {
-		// first half of array
-		if i%2 == 0 {
-			// even indices
-			s[i] = i + 1
-		} else {
-			// odd indices
-			s[i] = i + m + (m & 1)
-		}
-		// second half of array
-		s[m+i] = (i + 1) * 2
-	}
-
-	return s
 }
