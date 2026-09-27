@@ -9,10 +9,8 @@ Clarity and simplicity, not so much performance, are the goals.
 
 ## Quicksort
 
-The most interesting (and more practical) algorithm here is Tony Hoare's Quicksort.
-It's relatively fast, only slightly slower than the standard library on the average case.
-It's flexible, and gives you asymptotically optimal algorithms for median finding, top-K, etc
-(which the standard library lacks).
+The most interesting (and more practical) algorithm here is Tony Hoare's Quicksort (and Quickselect).
+It's flexible, and offers asymptotically optimal algorithms for median finding, top-K, etc.
 
 ![quicksort visualization](anims/quick.png)
 
@@ -22,8 +20,7 @@ when a bad pivot is detected:
 ![median-of-ninthers visualization](anims/ninthers.png)
 
 It adapts to mostly sorted, reversed and low cardinality inputs
-by tracking the number of swaps,
-and exiting early for already sorted sub-slices.
+by tracking the number of swaps to detect sorted sub-slices.
 
 The algorithm is fully deterministic,
 and every step contributes to partially sorting the array.
@@ -32,7 +29,7 @@ There's also a naïve parallel version.
 
 ## Heapsort
 
-An implementation of Floyd's bottom-up Heapsort.
+An implementation of Floyd's bottom-up Heapsort (and Heapselect).
 
 ![heapsort visualization](anims/heap.png)
 

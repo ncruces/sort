@@ -7,7 +7,6 @@ import "cmp"
 // It uses O(n·log(n)) time and O(1) space.
 func Sort[T cmp.Ordered](s []T) {
 	heapify(s)
-
 	m := len(s)
 	for {
 		if m--; m <= 0 {
@@ -22,10 +21,9 @@ func Sort[T cmp.Ordered](s []T) {
 // It uses O(n + k·log(n)) time and O(1) space.
 func SortLast[T cmp.Ordered](s []T, k int) {
 	// This does a bounds check before making any changes to the slice.
-	_ = s[len(s)-k:]
+	_ = s[:k:len(s)]
 
 	heapify(s)
-
 	m := len(s)
 	for range k {
 		if m--; m <= 0 {
@@ -34,6 +32,47 @@ func SortLast[T cmp.Ordered](s []T, k int) {
 		s[0], s[m] = s[m], s[0]
 		siftDown(s[:m], 0)
 	}
+}
+
+// SortFirst uses the Heapselect and Heapsort algorithms to sort the first k elements of a slice.
+// It uses O(k + (n-k)·log(k)) time and O(1) space.
+func SortFirst[T cmp.Ordered](s []T, k int) {
+	// This does a bounds check before making any changes to the slice.
+	_ = s[:k:len(s)]
+
+	heapify(s[:k])
+	for m := k; m < len(s); m++ {
+		if cmp.Less(s[m], s[0]) {
+			s[0], s[m] = s[m], s[0]
+			siftDown(s[:k], 0)
+		}
+	}
+	for {
+		if k--; k <= 0 {
+			break
+		}
+		s[0], s[k] = s[k], s[0]
+		siftDown(s[:k], 0)
+	}
+}
+
+// Select uses the Heapselect algorithm to find element k of the slice,
+// partially sorting the slice around, and returning, s[k].
+// It uses O(k + (n-k)·log(k)) time and O(1) space.
+func Select[T cmp.Ordered](s []T, k int) T {
+	// This does a bounds check before making any changes to the slice.
+	_ = s[k]
+
+	n := k + 1
+	heapify(s[:n])
+	for m := n; m < len(s); m++ {
+		if cmp.Less(s[m], s[0]) {
+			s[0], s[m] = s[m], s[0]
+			siftDown(s[:n], 0)
+		}
+	}
+	s[0], s[k] = s[k], s[0]
+	return s[k]
 }
 
 // Heapify rearranges a slice into a binary max-heap.

@@ -41,7 +41,7 @@ func TestSortLast(t *testing.T) {
 	for name, list := range Ints(1_000_000) {
 		t.Run(name, func(t *testing.T) {
 			SortLast(list, 1111)
-			n := len(list) - 1111 - 1
+			n := len(list) - 1112
 			if !slices.IsSorted(list[n:]) {
 				t.FailNow()
 			}
@@ -64,8 +64,12 @@ func TestSelect(t *testing.T) {
 	for name, list := range Ints(1_000_000) {
 		t.Run(name, func(t *testing.T) {
 			sel := Select(list, 1111)
-			slices.Sort(list)
 			if sel != list[1111] {
+				t.FailNow()
+			}
+			slices.Sort(list[:1111])
+			slices.Sort(list[1112:])
+			if !slices.IsSorted(list) {
 				t.FailNow()
 			}
 		})

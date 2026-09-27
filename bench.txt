@@ -3,67 +3,70 @@ goarch: amd64
 pkg: github.com/ncruces/sort
                         │    bench     │
                         │    sec/op    │
-Standard/floats-12         1.007 ±  3%
-Standard/zeros-12         32.37m ± 35%
-Standard/enums-12         102.1m ± 11%
-Standard/sorted-12        36.05m ± 49%
-Standard/rotated-12       58.81m ± 29%
-Standard/reversed-12      42.22m ± 48%
-Standard/pipeorgan-12     307.2m ±  4%
-Standard/permutation-12   806.8m ±  2%
-Standard/killer-12        317.0m ±  9%
-geomean                   142.0m
+Standard/floats-12        992.6m ±  2%
+Standard/zeros-12         32.36m ± 61%
+Standard/enums-12         99.40m ±  8%
+Standard/sorted-12        39.03m ± 38%
+Standard/rotated-12       57.94m ± 14%
+Standard/reversed-12      43.61m ± 29%
+Standard/pipeorgan-12     299.4m ±  3%
+Standard/permutation-12   797.3m ±  3%
+Standard/killer-12        314.8m ± 12%
+geomean                   142.1m
 
 pkg: github.com/ncruces/sort/heap
                     │    bench     │
                     │    sec/op    │
-Sort/floats-12         2.994 ±  3%
-Sort/zeros-12         727.8m ± 10%
-Sort/enums-12         715.5m ±  5%
-Sort/sorted-12        737.7m ±  4%
-Sort/rotated-12       716.5m ±  4%
-Sort/reversed-12      858.8m ±  2%
-Sort/pipeorgan-12     858.2m ±  2%
-Sort/permutation-12    2.764 ±  1%
-Sort/killer-12         1.604 ±  4%
-geomean                1.116
+Sort/floats-12         2.889 ±  2%
+Sort/zeros-12         731.9m ±  6%
+Sort/enums-12         704.8m ±  3%
+Sort/sorted-12        712.9m ±  2%
+Sort/rotated-12       695.8m ±  6%
+Sort/reversed-12      820.4m ±  5%
+Sort/pipeorgan-12     821.7m ±  3%
+Sort/permutation-12    2.704 ±  2%
+Sort/killer-12         1.534 ±  3%
+SortFirst-12          17.25m ±  2%
+SortLast-12           135.5m ± 13%
+Select-12             459.3m ±  2%
+geomean               601.0m
 
 pkg: github.com/ncruces/sort/quick
                         │    bench     │
                         │    sec/op    │
-Sort/floats-12            899.4m ±  2%
-Sort/zeros-12             48.72m ± 43%
-Sort/enums-12             152.8m ± 17%
-Sort/sorted-12            46.85m ± 35%
-Sort/rotated-12           262.2m ±  6%
-Sort/reversed-12          49.76m ± 22%
-Sort/pipeorgan-12         388.0m ±  2%
-Sort/permutation-12       722.5m ±  4%
-Sort/killer-12            593.8m ±  2%
-Parallel/floats-12        199.5m ± 19%
-Parallel/zeros-12         42.72m ± 17%
-Parallel/enums-12         107.5m ± 23%
-Parallel/sorted-12        48.71m ± 34%
-Parallel/rotated-12       107.8m ±  9%
-Parallel/reversed-12      39.38m ± 60%
-Parallel/pipeorgan-12     120.8m ±  5%
-Parallel/permutation-12   171.2m ± 15%
-Parallel/killer-12        181.1m ± 17%
-SortFirst-12              92.21m ±  1%
-SortLast-12               62.08m ±  2%
-Select-12                 87.11m ± 31%
-geomean                   129.8m
+Sort/floats-12            879.2m ±  2%
+Sort/zeros-12             40.30m ± 15%
+Sort/enums-12             142.8m ±  8%
+Sort/sorted-12            50.05m ± 12%
+Sort/rotated-12           254.1m ± 10%
+Sort/reversed-12          54.90m ± 12%
+Sort/pipeorgan-12         378.1m ±  5%
+Sort/permutation-12       718.9m ±  3%
+Sort/killer-12            588.4m ±  2%
+SortFirst-12              91.65m ±  4%
+SortLast-12               61.97m ±  2%
+Select-12                 86.59m ±  2%
+Parallel/floats-12        191.2m ±  8%
+Parallel/zeros-12         43.49m ± 33%
+Parallel/enums-12         107.0m ± 13%
+Parallel/sorted-12        40.95m ± 45%
+Parallel/rotated-12       106.8m ±  7%
+Parallel/reversed-12      49.31m ± 28%
+Parallel/pipeorgan-12     116.5m ±  3%
+Parallel/permutation-12   174.0m ± 13%
+Parallel/killer-12        187.6m ± 25%
+geomean                   128.8m
 
 pkg: github.com/ncruces/sort/shell
-                    │    bench     │
-                    │    sec/op    │
-Sort/floats-12         1.763 ±  2%
-Sort/zeros-12         296.9m ± 14%
-Sort/enums-12         416.4m ±  8%
-Sort/sorted-12        291.5m ± 11%
-Sort/rotated-12       315.2m ±  6%
-Sort/reversed-12      366.0m ±  5%
-Sort/pipeorgan-12     370.6m ±  2%
-Sort/permutation-12    1.511 ±  2%
-Sort/killer-12         2.533 ±  2%
-geomean               602.1m
+                    │    bench    │
+                    │   sec/op    │
+Sort/floats-12         1.734 ± 1%
+Sort/zeros-12         288.3m ± 6%
+Sort/enums-12         410.1m ± 5%
+Sort/sorted-12        303.3m ± 3%
+Sort/rotated-12       320.6m ± 5%
+Sort/reversed-12      373.6m ± 7%
+Sort/pipeorgan-12     367.7m ± 3%
+Sort/permutation-12    1.526 ± 3%
+Sort/killer-12         2.444 ± 3%
+geomean               600.9m
